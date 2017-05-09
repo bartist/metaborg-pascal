@@ -1,0 +1,129 @@
+module lexical-test
+
+language Pascal
+
+// INT
+
+test number 1 [[
+	1
+]] parse succeeds
+
+test number 9 [[
+	+9
+]] parse succeeds
+
+test negative number [[
+	-345
+]] parse succeeds
+
+test negative number cont. [[
+	-56345
+]] parse succeeds
+
+test large number[[
+	416824894
+]] parse succeeds
+
+test number with zero before[[
+	042
+]] parse succeeds
+
+test number with multiple zero before[[
+	0000057
+]] parse succeeds
+
+// REAL
+
+test real number [[
+	42.0
+]] parse succeeds
+
+test real number cont. [[
+	+345.0
+]] parse succeeds
+
+test real number cont. 2 [[
+	+3.415647
+]] parse succeeds
+
+test real number negative [[
+	-12.0
+]] parse succeeds
+
+test real number scientific sign - [[
+	123.0e-12
+]]
+
+test real number scientific sign + [[
+	123.0e+12
+]]
+
+test real number scientific no sign [[
+	123.0e4
+]]
+
+test real number without floating point [[
+	3234e19
+]] parse succeeds
+
+test real number without floating point sign - [[
+	93784e-12
+]] parse succeeds
+
+test real number without floating point sign + [[
+	18e+1333
+]] parse succeeds
+
+test real number with zeros [[
+	00000487.1
+]] parse succeeds
+
+test real number belown 1 [[
+	0.000000000000000000002
+]] parse succeeds
+
+// STRING
+
+test regular string [[
+	'hello world'
+]] parse succeeds
+	
+test Capslock string [[
+	'HELLO DARKNESS MY OLD FRIEND'
+]] parse succeeds
+
+test string with capital and lowercase [[
+	'Hello World'
+]] parse succeeds
+	
+test double-quote [[
+	"Hello World"
+]] parse fails
+
+test single quote in string [[
+	'Hello world, it''s me'
+]] parse succeeds
+
+test single quote in string [[
+	''''
+]] parse succeeds
+
+test single quote bad [[
+	'it's a mad world'
+]] parse fails
+
+test special symbols [[
+	';'
+]] parse succeeds
+
+test special symbols cont. [[
+	'[ ]'
+]] parse succeeds
+
+
+test empty string [[
+	''
+]] parse fails
+
+
+
