@@ -123,7 +123,59 @@ test special symbols cont. [[
 
 test empty string [[
 	''
+]] parse succeeds
+
+// Comment
+
+test comment [[
+	{ }
+]] parse succeeds
+
+test comment 2 [[
+	(* *)
+]] parse succeeds
+
+test comment with content [[
+	{ Bye World }
+]] parse succeeds
+
+test comment with content 2 [[
+	(* Bye World *)
+]] parse succeeds
+
+test comment with content 3 [[
+	(* Bye World }
+]] parse succeeds
+
+test comment with content 4 [[
+	{ Bye World *)
+]] parse succeeds
+
+test comment with * [[
+	{ no * allowed }
 ]] parse fails
+
+test comment with * 2 [[
+	(* no * allowed *)
+]] parse fails
+
+test comment with multiple * [[
+	{ no * allowed * * }
+]] parse fails
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
