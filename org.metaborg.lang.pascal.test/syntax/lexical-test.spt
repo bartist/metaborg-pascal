@@ -163,9 +163,59 @@ test comment with multiple * [[
 	{ no * allowed * * }
 ]] parse fails
 
+test comment with open bracket [[
+	{ not { allowed }
+]] parse fails
 
+test comment with alternative open bracket [[
+	(* not (* allowed *)
+]] parse fails
 
+test comment with open bracket 2 [[
+	{ not (* allowed }
+]] parse fails
 
+test comment with alternative open bracket 2 [[
+	(* not { allowed *)
+]] parse fails
+
+// ID
+
+test one-letter identifier lowercase [[
+	a
+]] parse succeeds
+
+test one-letter identifier uppercase [[
+	I
+]] parse succeeds
+
+test multiple letters identifier lowercase [[
+	sdafasdf
+]] parse succeeds
+
+test multiple letters identifier uppercase [[
+	EVERYTHING
+]] parse succeeds
+
+test multiple letters identifier upper- and lowercase [[
+	SomeBody
+]] parse succeeds
+
+test multiple letters identifier 2 [[
+	onceTold
+]] parse succeeds
+
+test identifier with numbers [[
+	h4llo
+]] parse succeeds
+
+test identifier with multiple numbers [[
+	h4770
+]] parse succeeds
+
+test identifier starting with numbers [[
+	4chan
+]] parse fails
 
 
 
