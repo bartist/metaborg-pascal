@@ -179,6 +179,37 @@ test comment with alternative open bracket 2 [[
 	(* not { allowed *)
 ]] parse fails
 
+test comment after identifier [[
+	someIdentifier (* some comment *)
+]] parse succeeds
+
+test comment after identifier 2[[
+	someIdentifier { some comment }
+]] parse succeeds
+
+test comment before identifier [[
+	(* some comment *) someIdentifier
+]] parse succeeds
+
+test comment before identifier 2[[
+	{ some comment } someIdentifier
+]] parse succeeds
+
+test comment after integer [[
+	2 (* some comment *)
+]] parse succeeds
+
+test comment after integer 2[[
+	3 { some comment }
+]] parse succeeds
+
+test comment before integer [[
+	(* some comment *) 4
+]] parse succeeds
+
+test comment before integer 2[[
+	{ some comment } 5
+]] parse succeeds
 // ID
 
 test one-letter identifier lowercase [[
@@ -217,10 +248,69 @@ test identifier starting with numbers [[
 	4chan
 ]] parse fails
 
+// Identifiers keyword
 
+test program keyword [[
+	program
+]] parse fails
 
+test var keyword [[
+	var
+]] parse fails
 
+test type keyword [[
+	type
+]] parse fails
 
+test const keyword [[
+	keyword
+]] parse fails
+
+test function keyword [[
+	function
+]] parse fails
+
+test procedure keyword [[
+	procedure
+]] parse fails
+
+test begin keyword [[
+	begin
+]] parse fails
+
+test end keyword [[
+	end
+]] parse fails
+
+test if keyword [[
+	if
+]] parse fails
+
+test then keyword [[
+	then
+]] parse fails
+
+test else keyword [[
+	else
+]] parse fails
+
+test case keyword [[
+	case
+]] parse fails
+
+test of keyword [[
+	of
+]] parse fails
+
+// keywords, but valid
+
+test true keyword [[
+	true
+]] parse succeeds
+
+test false keyword [[
+	false
+]] parse succeeds
 
 
 
