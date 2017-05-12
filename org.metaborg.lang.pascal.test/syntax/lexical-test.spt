@@ -331,7 +331,7 @@ test of keyword [[
 	of
 ]] parse fails
 
-// keywords, but valid
+// keywords, but valid as expression
 
 test true keyword [[
 	true
@@ -341,7 +341,47 @@ test false keyword [[
 	false
 ]] parse succeeds
 
+// ID not allowed
 
+test id with openBracketSquare [[
+	some[Identifier
+]] parse fails
+
+test id with closeBracketSquare [[
+	some]Identifier
+]] parse fails
+
+test id with star [[
+	some*identifier
+]] parse fails
+
+test id with plus [[
+	some+identifier
+]] parse fails
+
+test id with minus [[
+	some-identifier
+]] parse fails
+
+test id with lowerstripe [[
+	some_identifier
+]] parse fails
+
+test id with modulo [[
+	some%identifier
+]] parse fails
+
+test id with powersymbo [[
+	some^identifier
+]] parse fails
+
+test id with openbracket [[
+	some(identifier
+]] parse fails
+
+test id with closebracket [[
+	some)identifier
+]] parse fails
 
 
 
