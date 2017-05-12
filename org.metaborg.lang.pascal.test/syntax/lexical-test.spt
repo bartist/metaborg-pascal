@@ -151,16 +151,24 @@ test comment with content 4 [[
 	{ Bye World *)
 ]] parse succeeds
 
-test comment with * [[
-	{ no * allowed }
-]] parse fails
+test comment empty comment [[
+	{*)
+]] parse succeeds
 
-test comment with * 2 [[
-	(* no * allowed *)
-]] parse fails
+test comment empty comment 2 [[
+	(*}
+]] parse succeeds
 
-test comment with multiple * [[
-	{ no * allowed * * }
+test comment empty comment 3 [[
+	{}
+]] parse succeeds
+
+test comment empty comment 4 [[
+	(**)
+]] parse succeeds
+
+test faulty empty comment [[
+	(*)
 ]] parse fails
 
 test comment with open bracket [[
