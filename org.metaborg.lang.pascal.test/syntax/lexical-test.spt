@@ -2,7 +2,16 @@ module lexical-test
 
 language Pascal
 
+fixture [[
+	program test ();
+	begin
+		writeln([[...]])
+	end.
+]]
+
+
 // INT
+
 
 test number 1 [[
 	1
@@ -52,15 +61,19 @@ test real number negative [[
 
 test real number scientific sign - [[
 	123.0e-12
-]]
+]] parse succeeds
 
 test real number scientific sign + [[
 	123.0e+12
-]]
+]] parse succeeds
+
+test real number scientific Capital E [[
+	123.0E+4
+]] parse fails
 
 test real number scientific no sign [[
 	123.0e4
-]]
+]] parse succeeds
 
 test real number without floating point [[
 	3234e19
@@ -292,7 +305,7 @@ test type keyword [[
 ]] parse fails
 
 test const keyword [[
-	keyword
+	const
 ]] parse fails
 
 test function keyword [[
@@ -349,18 +362,6 @@ test id with openBracketSquare [[
 
 test id with closeBracketSquare [[
 	some]Identifier
-]] parse fails
-
-test id with star [[
-	some*identifier
-]] parse fails
-
-test id with plus [[
-	some+identifier
-]] parse fails
-
-test id with minus [[
-	some-identifier
 ]] parse fails
 
 test id with lowerstripe [[
