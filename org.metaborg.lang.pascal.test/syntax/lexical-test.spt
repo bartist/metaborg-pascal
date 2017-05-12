@@ -168,11 +168,11 @@ test comment empty comment 4 [[
 ]] parse succeeds
 
 test somehow valid comment [[
-	{) *)
+	(* {) *)
 ]] parse succeeds
 
 test faulty comment [[
-	(*) *)
+	(* (*) *)
 ]] parse fails
 
 test comment with open bracket [[
@@ -189,6 +189,22 @@ test comment with open bracket 2 [[
 
 test comment with alternative open bracket 2 [[
 	(* not { allowed *)
+]] parse fails
+
+test comment with close bracket [[
+	{ not } allowed }
+]] parse fails
+
+test comment with alternative close bracket [[
+	(* not *) allowed *)
+]] parse fails
+
+test comment with close bracket 2 [[
+	{ not *) allowed }
+]] parse fails
+
+test comment with alternative close bracket 2 [[
+	(* not } allowed *)
 ]] parse fails
 
 test comment after identifier [[
