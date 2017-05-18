@@ -7,6 +7,8 @@ imports
   nabl2/api
   libspoofax/stratego/debug
   codegen/-
+  pascal
+  pp
 
 imports // Jasmin signatures
 
@@ -32,11 +34,70 @@ imports // Jasmin signatures
   signatures/JasminXT-Types-sig
   signatures/JasminXT-Whitespace-sig
   signatures/jasmin-sig
-  reference/desugar-signatures
   analysis
 
 rules
 
-  program-to-jbc: [] -> []
+  program-to-jbc: Program(ProgramHeading(name, _), block) -> [
+  	JBCFile(
+	  JBCHeader(None(), JBCSource(""), JBCClass([PUBLIC()], name), JBCSuper("java/lang/Object"), [], None(), None(), [], [], []),
+	  [], [ JBCMethod( // Init method
+	      [PUBLIC()]
+	    , Init()
+	    , JBCMethodDesc([], Void())
+	    , [ ALOAD(VarNum("0"))
+	      , INVOKESPECIAL(
+	          JBCMethodRef(CRef("java/lang/Object"), MRef(Init()), JBCMethodDesc([], Void()))
+	        )
+	      , RETURN()
+	      ]
+	    )
+	  , JBCMethod( // Main method
+	      [PUBLIC(), STATIC()]
+	    , "main"
+	    , JBCMethodDesc([Array(Reference(CRef("java/lang/String")))], Void())
+	    , body
+	    )
+	  ])
+  ]
+  	where
+  		body := <block-to-jbc> block
+  		
+   block-to-jbc: Block(_, _, _, _, _, statements, _) -> [
+   	
+   ]
+  	where 
+  		jbcs := <statements-to-jbc> statements
+  		
   
+  statements-to-jbc: [] -> []
+  statements-to-jbc: [statement | statements] -> [ jbcstmnt | jbcstmnts ]
+  	where
+  		jbcstmnt := <statement-to-jbc> statement;
+  		jbcstmnts := <statements-to-jbc> statements
+  		
+  statement-to-jbc: ProcCall("writeln", params) -> <write-jbc> params
+  
+  write-jbc: [] -> []
+  write-jbc: [param | params] -> <concat> [[GETSTATIC(
+          JBCFieldRef( 
+            CRef("java/lang/System")
+          , FRef("out")
+          , JBCFieldDesc(Reference(CRef("java/io/PrintStream")))
+          )
+        )
+      ], push-param
+      ,[INVOKEVIRTUAL(
+          JBCMethodRef(
+            CRef("java/io/PrintStream")
+          , MRef("println")
+          , JBCMethodDesc([Int()], Void())
+          )
+        )]   
+   , writenext ]
+   	where
+   		push-param := <exp-to-jbc> param;
+   		writenext := <write-jbc> params
+   	
+  exp-to-jbc: String(content) -> LDC(content)
   
