@@ -3,12 +3,12 @@ module codegen/convert
 
 imports
 
-  reference/src-gen/signatures/-
   nabl2/api
   libspoofax/stratego/debug
   codegen/-
   pascal
   pp
+  signatures/-
 
 imports // Jasmin signatures
 
@@ -60,33 +60,33 @@ rules
 	    )
 	  ])
   ]
-  	where
+  	with
   		body := <block-to-jbc> block
   		
    block-to-jbc: Block(_, _, _, _, _, statements, _) -> [
    	
    ]
-  	where 
+  	with 
   		jbcs := <statements-to-jbc> statements
   		
   
   statements-to-jbc: [] -> []
   statements-to-jbc: [statement | statements] -> [ jbcstmnt | jbcstmnts ]
-  	where
+  	with
   		jbcstmnt := <statement-to-jbc> statement;
   		jbcstmnts := <statements-to-jbc> statements
   		
-  statement-to-jbc: ProcCall("writeln", params) -> <write-jbc> params
+  statement-to-jbc: ProcCall("writeln", Params(params)) -> <print-in-jbc> params
   
-  write-jbc: [] -> []
-  write-jbc: [param | params] -> <concat> [[GETSTATIC(
+  print-in-jbc: [] -> []
+  print-in-jbc: [param | params] -> <concat> [[GETSTATIC(
           JBCFieldRef( 
             CRef("java/lang/System")
           , FRef("out")
           , JBCFieldDesc(Reference(CRef("java/io/PrintStream")))
           )
         )
-      ], push-param
+      ], pushparam
       ,[INVOKEVIRTUAL(
           JBCMethodRef(
             CRef("java/io/PrintStream")
@@ -95,9 +95,9 @@ rules
           )
         )]   
    , writenext ]
-   	where
-   		push-param := <exp-to-jbc> param;
-   		writenext := <write-jbc> params
+   	with
+   		pushparam := <exp-to-jbc> param;
+   		writenext := <print-in-jbc> params 
    	
-  exp-to-jbc: String(content) -> LDC(content)
+  exp-to-jbc: String(content) -> [LDC(content)]
   

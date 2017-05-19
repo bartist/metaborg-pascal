@@ -35,6 +35,4 @@ language:
     - stratego-sdf
     - -la
     - strc
-exports:
-  directory: reference
     

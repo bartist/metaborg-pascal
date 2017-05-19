@@ -22,7 +22,9 @@ rules
   show-jbc:
     (selected, _, ast, path, project-path) -> (filename, result)
     with
+      debug ;
       filename := <guarantee-extension(|$[j.aterm])> path
+    ; debug
     ; result   := <program-to-jbc; map(set-jasmin-source(|path))> ast
 
   /**
