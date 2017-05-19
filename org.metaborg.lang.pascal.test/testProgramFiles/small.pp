@@ -1,5 +1,5 @@
-program dinges ();
+program helloWorld ();
 begin
   { Write 'Hello World' }
-  writeln('Hello World')
+  writeln('Hello', ' ', 'World')
 end.
