@@ -1,9 +1,9 @@
 ---
-id: org.metaborg:org.metaborg.lang.pascal.test:1.0.0-SNAPSHOT
+id: org.metaborg:org.metaborg.lang.pascal.test:0.1.0-SNAPSHOT
 name: Pascal
 dependencies:
   compile:
-  - org.metaborg:org.metaborg.lang.pascal:1.0.0-SNAPSHOT
+  - org.metaborg:org.metaborg.lang.pascal:0.1.0-SNAPSHOT
   - org.metaborg:org.metaborg.meta.lang.spt:${metaborgVersion}
 build:
   useBuildSystemSpec: true
