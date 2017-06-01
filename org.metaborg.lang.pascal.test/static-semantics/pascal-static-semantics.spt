@@ -3,8 +3,141 @@ module pascal-static-semantics
 language Pascal
 start symbol Program
 
-test variable reference [[ 
-  program example0 () ;
+fixture [[
+	program test ();
+	[[...]]
+]]
+
+//Constants
+
+test contsant resolve [[
+const
+ 	[[maxnumber]] = 500;
+ var
+ 	number : integer;
+ begin
+ 	number := [[maxnumber]]
+ end.
+]] resolve #2 to #1
+
+test constant resolve from type [[
+ const
+ 	[[maxnumber]] = 500;
+  type
+  	intArr = array [1..[[maxnumber]] ] of integer;
+ begin
+ end.
+]] resolve #2 to #1
+
+test constant resolve from procedure [[
+ const
+ 	[[maxnumber]] = 500;
+procedure f(x: integer);
+	begin
+		x := [[maxnumber]]
+	end;
+ begin
+ end.
+]] resolve #2 to #1
+
+test constant resolve from function [[
+ const
+ 	[[maxnumber]] = 500;
+function f(x: integer): integer;
+	begin
+		f := [[maxnumber]]
+	end;
+ begin
+ end.
+]] resolve #2 to #1
+
+test constant resolve from nested [[
+ const
+ 	[[maxnumber]] = 500;
+function f(x: integer): integer;
+	function g(x: integer): integer;
+		begin
+			g := [[maxnumber]]
+		end;
+	begin
+		f := g()
+	end;
+ begin
+ end.
+]] resolve #2 to #1
+
+// Type
+
+test type resolve [[
+  type
+  	[[intArr]] = array [1..50] of integer;
+  var
+  	numArr : [[intArr]];
+  begin
+  end.  	
+]] resolve #2 to #1
+
+test type resolve to function [[
+  type
+  	[[intArr]] = array [1..50] of integer;
+  function f(x : intArr) : [[intArr]];
+	  begin
+	  	f := x
+	  end;
+  begin
+  end.  	
+]] resolve #2 to #1
+
+test type resolve to function parameter [[
+  type
+  	[[intArr]] = array [1..50] of integer;
+  function f(x : [[intArr]]) : intArr;
+	  begin
+	  	f := x
+	  end;
+  begin
+  end.  	
+]] resolve #2 to #1
+
+test type resolve to function type [[
+  type
+  	[[intArr]] = array [1..50] of integer;
+  function f(x : intArr) : intArr;
+  	  type
+  	  	intMatrix = array[1..50] of [[intArr]];
+	  begin
+	  	f := x
+	  end;
+  begin
+  end.  	
+]] resolve #2 to #1
+
+test type resolve to procedure [[
+  type
+  	[[intArr]] = array [1..50] of integer;
+  procedure f(x : [[intArr]]);
+	  begin
+	  end;
+  begin
+  end.  	
+]] resolve #2 to #1
+
+
+test type resolve to function type [[
+  type
+  	[[intArr]] = array [1..50] of integer;
+  procedure f(x : intArr);
+  	  type
+  	  	intMatrix = array[1..50] of [[intArr]];
+	  begin
+	  end;
+  begin
+  end.  	
+]] resolve #2 to #1
+
+// variables
+
+test variable resolve [[ 
   var
     [[x]] : boolean;
   begin
@@ -12,8 +145,44 @@ test variable reference [[
   end.
 ]] resolve #2 to #1 
 
-test variable reference [[ 
-  program example0 () ;
+// Function
+
+test function resolve [[
+  var
+    x: integer;
+  function [[f]](x : integer): integer;
+  begin
+  	f := 2
+  end;
+ begin
+ 	x := [[f]]()
+ end.
+]] resolve #2 to #1
+
+test function parameter resolve [[
+  var
+    x: integer;
+  function f([[x]]: integer): integer;
+  begin
+  	f := [[x]]
+  end;
+ begin
+ 	x := f(2)
+ end.
+]] resolve #2 to #1
+
+// Procedure
+
+test procedure resolve [[
+procedure[[f]]()
+  begin
+  end;
+ begin
+ 	[[f]]()
+ end.
+]] resolve #2 to #1
+
+test procedure parameter resolve [[ 
   var
     x : boolean;
   procedure f([[x]] : integer); 
@@ -23,3 +192,17 @@ test variable reference [[
   begin
   end.
 ]] resolve #2 to #1 
+
+
+// Same name different scope
+
+
+// errors:
+
+// duplication
+
+// missing definition
+
+
+// not resolve to higher scope
+
