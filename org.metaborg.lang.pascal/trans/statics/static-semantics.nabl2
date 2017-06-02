@@ -13,6 +13,10 @@ imports
   analysis
   nabl-lib
   types
+  
+signature
+     name resolution
+         namespaces Var Lab Fun Type
 
 rules // run-time library (=> define separately?)
 
@@ -57,15 +61,22 @@ rules
      Program{name} <- s.
     
   [[ Block(lds, cds, tds, vds, pfds, stms, _) ^ (s) ]] := 
-     [[ lds ^ (s) ]],
-     [[ cds ^ (s) ]],
-     [[ tds ^ (s) ]],
-     [[ vds ^ (s) ]],
-     Map[[ pfds ^ (s) ]],
-     Map[[ stms ^ (s) ]].
+  	 distinct D(s)/Lab | error $[Duplicate Label] @NAMES, // distinct labels
+  	 distinct D(s)/Var | error $[Dublicate variable/constant] @NAMES, //distinct variables
+     [[ lds ^ (s) ]], // labels
+     [[ cds ^ (s) ]], // constants
+     [[ tds ^ (s) ]], // types
+     [[ vds ^ (s) ]], // variables
+     Map[[ pfds ^ (s) ]], // procedures and functions
+     Map[[ stms ^ (s) ]]. // actual code
      
+  [[ None() ^ (s) ]] := true.
+  [[ Some(decls) ^ (s) ]] := [[ decls ^ (s) ]].
+  
 //  [[ NoLabelDecls() ^ (s) ]] := true.  
-  [[ LabelDecls(_)  ^ (s) ]] := false | note "label declarations not implemented".
+  [[ LabelDecls(labels)  ^ (s) ]] := Map[[ labels ^ (s) ]].
+  [[ Label(num) ^ (s) ]] :=
+  	Lab{num} -> s.
   
 //  [[ NoConstDefs()  ^ (s) ]] := true.  
   [[ ConstDefs(cds) ^ (s) ]] := Map[[ cds ^ (s) ]].  
