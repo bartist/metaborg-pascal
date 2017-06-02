@@ -8,7 +8,9 @@ fixture [[
 	[[...]]
 ]]
 
-//Constants
+// Label
+  label
+// Constants
 
 test contsant resolve [[
 const
@@ -300,16 +302,120 @@ test nested procedure parameter resolve 2 [[
 ]] resolve #3 to #2
 
 
-
-// Same name different scope
-
-
 // errors:
 
 // duplication
 
+test constant duplication [[
+  const
+    some = 10;
+    some = 20;
+  begin
+  end.
+]] >= 1 error
+
+
+test type duplication [[
+  type
+  	intArr = array[1..10] of integer;
+  	intArr = array[11..21] of integer;
+  begin
+  end.
+]] >= 1 error
+
+test variable duplication [[
+  var
+  	x : integer;
+  	x : boolean;
+ begin
+ end.
+]] >= 1 error
+
+test function duplication [[
+  function f(x:integer): integer;
+	  begin
+	  	f := x
+	  end;
+  function f(s:integer): integer;
+	  begin
+	  	f := s
+	  end;
+  begin
+  end.
+]] >= 1 error
+
+test procedure duplication [[
+  procedure f(x:integer);
+	  begin
+	  end;
+  procedure f(s:integer);
+	  begin
+	  end;
+  begin
+  end.
+]] >= 1 error
+
 // missing definition
 
+test missing constant [[
+  type
+  	intArr = array [1..limit] of integer;
+  begin
+  end.
+]] >= 1 error
 
+test missing type variable [[
+  var
+  	x: intArr;
+  begin
+  end.
+]] >= 1 error
+
+test missing type function [[
+  function f(x:integer) : intArr;
+  	begin
+  	  f := x
+  	end;
+  begin
+  end.
+ ]] >= 1 error
+
+
+test missing type function parameter [[
+  function f(x:intArr) : integer;
+  	begin
+  	  f := 3
+  	end;
+  begin
+  end.
+ ]] >= 1 error
+
+test missing type procedure parameter [[
+  procedure f(x:intArr);
+  	begin
+  	end;
+  begin
+  end.
+ ]] >= 1 error
+ 
+test missing function [[
+var
+  i : integer;
+begin
+  i := f(2)
+end.
+]] >= 1 error
+
+test missing procedure [[
+begin
+  p(3)
+end.
+]] >= 1 error
+ 
+ 
 // not resolve to higher scope
+
+// Same name different scope
+
+
 
