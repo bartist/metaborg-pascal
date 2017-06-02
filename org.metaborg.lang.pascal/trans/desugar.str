@@ -9,6 +9,10 @@ strategies
   
 rules
 
+  desugar:
+  	Label(stringnum) -> Label(intnum)
+  	where <string-to-int> stringnum => intnum
+  	
   desugar :
     Params(ps) -> Params(ps')
     where <mapconcat(try(desugar-param))> ps => ps'
@@ -18,6 +22,22 @@ rules
     
   desugar-param :
     ValueParams(xs, t) -> <map(!ValueParams([<id>], t))> xs
+
+  // Transform procedures to Void function calls
+  
+  desugar :
+  	ProcCall(fun, params) -> FunCall(fun, params)
+  
+  desugar :
+  	ProcDecl(h,b) -> FuncDecl(h', b)
+  	where <desugar-proc-heading> h => h'
+
+  desugar-proc-heading :
+  	ProcHeading(name, params) -> FuncHeading(name, params, TypeId("void"))
+  
+//  desugar :
+//  	String(str) -> String(str')
+//  	where <remove-quotationmarks> str => str'
 
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)
