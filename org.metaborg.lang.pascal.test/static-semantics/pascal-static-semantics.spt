@@ -60,7 +60,7 @@ function f(x: integer): integer;
 			g := [[maxnumber]]
 		end;
 	begin
-		f := g()
+		f := g(1)
 	end;
  begin
  end.
@@ -145,6 +145,48 @@ test variable resolve [[
   end.
 ]] resolve #2 to #1 
 
+test variable resolve in higher scope [[ 
+  var
+    [[x]] : boolean;
+  procedure f(i : boolean);
+    var
+      [[x]] : boolean;
+    begin
+      i := [[x]]
+    end;
+  begin
+    x := f(true)
+  end.
+]] resolve #3 to #2 
+
+test variable resolve to lower scope [[ 
+  var
+    [[x]] : boolean;
+  procedure f(i : boolean);
+    begin
+      i := [[x]]
+    end;
+  begin
+    x := f(true)
+  end.
+]] resolve #2 to #1 
+
+test variable resolve nested function [[
+  var
+    [[x]]: integer;
+  function f(s: integer): integer;
+  	  function g(s: integer): integer;
+	  begin
+	  	g := [[x]]
+	  end;
+  begin
+  	f := g([[x]])
+  end;
+ begin
+ 	x := f(2)
+ end.
+]] resolve #2 to #1
+
 // Function
 
 test function resolve [[
@@ -161,7 +203,7 @@ test function resolve [[
 
 test function parameter resolve [[
   var
-    x: integer;
+    [[x]]: integer;
   function f([[x]]: integer): integer;
   begin
   	f := [[x]]
@@ -171,10 +213,42 @@ test function parameter resolve [[
  end.
 ]] resolve #2 to #1
 
+test nested function parameter resolve [[
+  var
+    [[x]]: integer;
+  function f([[x]]: integer): integer;
+  	  function g([[x]]: integer): integer;
+	  begin
+	  	g := [[x]]
+	  end;
+  begin
+  	f := g([[x]])
+  end;
+ begin
+ 	x := f(2)
+ end.
+]] resolve #4 to #3
+
+test nested function parameter resolve 2 [[
+  var
+    [[x]]: integer;
+  function f([[x]]: integer): integer;
+  	  function g(s: integer): integer;
+	  begin
+	  	g := [[x]]
+	  end;
+  begin
+  	f := g([[x]])
+  end;
+ begin
+ 	x := f(2)
+ end.
+]] resolve #3 to #2
+
 // Procedure
 
 test procedure resolve [[
-procedure[[f]]()
+procedure[[f]](x : integer);
   begin
   end;
  begin
@@ -192,6 +266,39 @@ test procedure parameter resolve [[
   begin
   end.
 ]] resolve #2 to #1 
+
+test nested procedure parameter resolve [[
+  var
+    [[x]]: integer;
+  procedure f([[x]]: integer);
+  	  procedure g([[x]]: integer);
+	  begin
+	  	x := [[x]]
+	  end;
+  begin
+  	g([[x]])
+  end;
+ begin
+ 	f(2)
+ end.
+]] resolve #4 to #3
+
+test nested procedure parameter resolve 2 [[
+  var
+    [[x]]: integer;
+  procedure f([[x]]: integer);
+  	  procedure g(s: integer);
+	  begin
+	  	s := [[x]]
+	  end;
+  begin
+  	g([[x]])
+  end;
+ begin
+ 	f(2)
+ end.
+]] resolve #3 to #2
+
 
 
 // Same name different scope
