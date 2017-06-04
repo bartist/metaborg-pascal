@@ -1,6 +1,9 @@
 program dinges ();
 label
-	1, 01, 001;
+	1;
+const
+	all = 50;
+	moreall = -all;
 var 
 	x : integer;
 function g(x : integer) : integer;
