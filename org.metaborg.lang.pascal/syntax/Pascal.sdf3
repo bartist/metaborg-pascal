@@ -136,41 +136,42 @@ context-free syntax // Procedure and Function Definitions
 context-free syntax // Statements
  
   Statement.Labeled =
-    <<Label> : <Statement>>
-    // should probably not be another labeled statement
+    <<Label> : <UnlabeledStatement>>
+    
+  Statement = <<UnlabeledStatement>>
     
   // optional empty statement at end of block
   //  Term.NoTerm = <>
   Term.Term   = <;> 
 
-  Statement.Assign =
+  UnlabeledStatement.Assign =
     <<Variable> := <Expression>>
 
-  Statement.ProcCall =
+  UnlabeledStatement.ProcCall =
     <<Identifier><ActualParameters>>
     
-  Statement.Goto =
+  UnlabeledStatement.Goto =
     <goto <Label>> {case-insensitive}
   
-  Statement.Compound = <
+  UnlabeledStatement.Compound = <
     begin 
       <{Statement ";\n"}+> 
       <Term?>
     end
   > {case-insensitive}
   
-  Statement.While = <
+  UnlabeledStatement.While = <
     while <Expression> do 
       <Statement>
   > {case-insensitive}
   
-  Statement.Repeat = <
+  UnlabeledStatement.Repeat = <
     repeat 
       <{Statement ";"}+> 
     until <Expression>
   > {case-insensitive}
   
-  Statement.For = <
+  UnlabeledStatement.For = <
     for <Identifier> := <Expression> <UpDown> <Expression> do 
       <Statement>
   > {case-insensitive}
@@ -178,19 +179,19 @@ context-free syntax // Statements
   UpDown.Up = <to> {case-insensitive}
   UpDown.Down = <downto> {case-insensitive}
 
-  Statement.If = <
+  UnlabeledStatement.If = <
     if <Expression> then 
       <Statement>
   > {case-insensitive}
   
-  Statement.IfElse = <
+  UnlabeledStatement.IfElse = <
     if <Expression> then 
       <Statement>
     else 
       <Statement>
   > {case-insensitive}
   
-  Statement.Case = <
+  UnlabeledStatement.Case = <
     case <Expression> of
       <CaseLimb+>
     end
@@ -199,7 +200,7 @@ context-free syntax // Statements
   CaseLimb.CaseLimb = 
     <<{Constant ", "}+> : <Statement>;>
 
-  Statement.With = <
+  UnlabeledStatement.With = <
     with <{Variable ", "}+> do
       <Statement>
   > {case-insensitive}
