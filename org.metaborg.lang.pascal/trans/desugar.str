@@ -35,9 +35,11 @@ rules
   desugar-proc-heading :
   	ProcHeading(name, params) -> FuncHeading(name, params, TypeId("void"))
   
-//  desugar :
-//  	String(str) -> String(str')
-//  	where <remove-quotationmarks> str => str'
+  // Remove quotationmarks from string
+  
+  desugar :
+  	String(str) -> String(str')
+  	where <string-tokenize(|['\''])> str => str'
 
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)
