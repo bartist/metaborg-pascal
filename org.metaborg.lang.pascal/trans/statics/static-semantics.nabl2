@@ -27,9 +27,10 @@ rules // run-time library (=> define separately?)
     
     Type{"integer"} <- s, Type{"integer"} : IntT(),
     Type{"boolean"} <- s, Type{"boolean"} : BoolT(),
+    Type{"void"} 	<- s, Type{"void"}	  : VoidT(),
     
-    Proc{"writeln"} <- s, Proc{"writeln"} : ProcT([StringT()]),
-    Proc{"readln"}  <- s, Proc{"readln"}  : ProcT([StringT()]),
+    Fun{"writeln"} <- s, Fun{"writeln"} : FunT([StringT()], VoidT()),
+    Fun{"readln"}  <- s, Fun{"readln"}  : FunT([StringT()], VoidT()),
      
     Op{ADD()}  <- s, Op{ADD()}  : FunT([IntT(), IntT()], IntT()),    
     Op{MIN()}  <- s, Op{MIN()}  : FunT([IntT(), IntT()], IntT()),     
@@ -92,13 +93,6 @@ rules
   [[ VarId(x) ^ (s) : ty ]] := Var{x} <- s, Var{x} : ty.
  
   // note: this does not implement declaration before use
-  
-  [[ ProcDecl(ph, b) ^ (s) ]] := 
-     new s', s' -P-> s, 
-     [[ ph ^ (s, s') ]], [[ b ^ (s') ]].
-  
-  [[ ProcDirective(_, _) ^ (s) ]] := false | error "ProcDirective not implemented".
-  [[ ProcId(_, _) ^ (s) ]] := false | error "ProcId not implemented".
  
   [[ FuncDecl(ph, b) ^ (s) ]] := 
      new s', s' -P-> s, 
@@ -110,10 +104,6 @@ rules
   // [[ Statements(stms) ^ (s) ]] := Map[[ stms ^ (s) ]].
   
 rules // procedure and function definitions
-
-  [[ ProcHeading(f, params) ^ (s_par, s) ]] := 
-     [[ params ^ (s) : tys ]],
-     Proc{f} <- s_par, Proc{f} : ProcT(tys).
      
   [[ FuncHeading(f, params, t) ^ (s_par, s) ]] := 
      [[ params ^ (s) : tys ]], 
@@ -167,13 +157,10 @@ rules // statements
   [[ Assign(v, e) ^ (s) ]] := 
      [[ v ^ (s) : ty1 ]], [[ e ^ (s) : ty2 ]], ty1 == ty2.
      // todo: subtype check?
-    
-  [[ ProcCall(f, params) ^ (s) ]] := 
-     Proc{f} -> s, Proc{f} |-> d, d: ProcT(tys), 
-     [[ params ^ (s) : tys ]].
      
   [[ Goto(l) ^ (s) ]] := true. 
      // todo: anything to check?
+     // answer: check if label is used
   
   [[ Compound(stms, _) ^ (s) ]] :=
      Map[[ stms ^ (s) ]].
@@ -308,7 +295,6 @@ rules // constants
      
   [[ Int(_)  ^ (s) : IntT()  ]] := true.
   [[ Real(_) ^ (s) : RealT() ]] := true.
-  [[ String(_) ^ (s) : StringT() ]] := true.
   
 
    
