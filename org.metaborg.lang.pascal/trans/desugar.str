@@ -39,7 +39,7 @@ rules
   
   desugar :
   	String(str) -> String(str')
-  	where <string-tokenize(|['\''])> str => str'
+  	where <string-tokenize(|['\''])> str => [str']
 
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)

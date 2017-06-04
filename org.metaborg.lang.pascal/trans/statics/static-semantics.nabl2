@@ -308,6 +308,7 @@ rules // constants
      
   [[ Int(_)  ^ (s) : IntT()  ]] := true.
   [[ Real(_) ^ (s) : RealT() ]] := true.
+  [[ String(_) ^ (s) : StringT() ]] := true.
   
 
    
