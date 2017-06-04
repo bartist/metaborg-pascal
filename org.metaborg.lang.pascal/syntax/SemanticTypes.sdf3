@@ -6,6 +6,7 @@ context-free syntax
   SemType.RealT = <real>
   SemType.BoolT = <boolean>
   SemType.StringT = <string>
+  SemType.VoidT = <void>
   SemType.FunT = <function(<{SemType ","}*>)<SemType>>
   SemType.ProcT = <procedure(<{SemType ","}*>)>
   SemType.ArrayT = <array <{SemType ","}*> of <SemType>>

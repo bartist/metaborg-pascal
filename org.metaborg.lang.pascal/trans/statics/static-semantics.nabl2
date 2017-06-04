@@ -77,7 +77,7 @@ rules
 //  [[ NoLabelDecls() ^ (s) ]] := true.  
   [[ LabelDecls(labels)  ^ (s) ]] := Map[[ labels ^ (s) ]].
   [[ Label(num) ^ (s) ]] :=
-  	Lab{num} -> s.
+  	Lab{num} <- s.
   
 //  [[ NoConstDefs()  ^ (s) ]] := true.  
   [[ ConstDefs(cds) ^ (s) ]] := Map[[ cds ^ (s) ]].  

@@ -13,6 +13,14 @@ rules
   	Label(stringnum) -> Label(intnum)
   	where <string-to-int> stringnum => intnum
   	
+  desugar:
+    Goto(Label(stringnum)) -> Goto(intnum)
+  	where <string-to-int> stringnum => intnum
+  
+  desugar:
+    Labeled(Label(stringnum), stmnt) -> Labeled(intnum, stmnt)	
+  	where <string-to-int> stringnum => intnum
+  
   desugar :
     Params(ps) -> Params(ps')
     where <mapconcat(try(desugar-param))> ps => ps'

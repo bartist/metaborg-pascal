@@ -361,6 +361,7 @@ var
 begin
 	1: x := 1;
 	1: x := x
+end.
 ]] >= 1 error
 
 test constant duplication [[
@@ -419,7 +420,7 @@ test missing label [[
    i : integer;
   begin
     1: i := 3
-  end
+  end.
 ]] >= 1 error
 
 test missing label 2 [[
@@ -429,7 +430,7 @@ test missing label 2 [[
    i : integer;
   begin
     goto 1
-  end
+  end.
 ]] >= 1 error
 
 test missing constant [[
