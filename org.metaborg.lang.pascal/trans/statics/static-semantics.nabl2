@@ -27,7 +27,8 @@ rules // run-time library (=> define separately?)
     
     Type{"integer"} <- s, Type{"integer"} : IntT(),
     Type{"boolean"} <- s, Type{"boolean"} : BoolT(),
-    Type{"void"} 	<- s, Type{"void"}	  : VoidT(),
+    // _void is used instead of void, because void can be defined as type
+    Type{"_void"} 	<- s, Type{"_void"}	  : VoidT(),
     
     Fun{"writeln"} <- s, Fun{"writeln"} : FunT([StringT()], VoidT()),
     Fun{"readln"}  <- s, Fun{"readln"}  : FunT([StringT()], VoidT()),
@@ -63,6 +64,7 @@ rules
     
   [[ Block(lds, cds, tds, vds, pfds, stms, _) ^ (s) ]] := 
   	 distinct D(s)/Lab | error $[Duplicate Label] @NAMES, // distinct labels
+  	 distinct D(s)/LabRef | error $[Duplicate Label usage] @NAMES, // distinct labels
   	 distinct D(s)/Var | error $[Dublicate variable/constant] @NAMES, //distinct variables
      [[ lds ^ (s) ]], // labels
      [[ cds ^ (s) ]], // constants
@@ -72,7 +74,6 @@ rules
      Map[[ stms ^ (s) ]]. // actual code
      
   [[ None() ^ (s) ]] := true.
-  [[ Some(decls) ^ (s) ]] := [[ decls ^ (s) ]].
   
   [[ LabelDecls(labels)  ^ (s) ]] := Map[[ labels ^ (s) ]].
   [[ Label(num) ^ (s) ]] :=
@@ -82,21 +83,26 @@ rules
   [[ [] ^ (s, s_outer) ]] := true.
 
   [[ ConstDefs(cds) ^ (s) ]] := [[ cds ^ (s, s) ]].  
-  [[ [ConstDef(x, c)| constdefs ] ^ (s, s_outer) ]] := 
+  [[ [ConstDef(x, c) | constdefs ] ^ (s, s_outer) ]] := 
   	[[ c ^ (s_outer) : ty ]], 
   	new s',
   	s ---> s',
   	Var{x} <- s', 
   	Var{x} : ty,
   	[[ constdefs ^ (s', s_outer) ]].
-  	// todo: add immutible
+  	// todo: add immutible  
+  	
+  [[ TypeId(t) ^ (s) : ty ]] := 
+	Type{t} -> s,
+	Type{t} |-> d,
+	d : ty.
      
   [[ TypeDefs(tds) ^ (s) ]] := [[ tds ^ (s) ]].
-  [[ [TypeDef(x, t), typedefs] ^ (s, s_outer) ]] := 
+  [[ [TypeDef(x, t) | typedefs] ^ (s, s_outer) ]] := 
   	[[ t ^ (s_outer) : ty ]], 
   	new s',
   	s ---> s',
-  	Type{x} <- s, 
+  	Type{x} <- s', 
   	Type{x} : ty,
   	[[ typedefs ^ (s', s_outer) ]].
   
@@ -104,16 +110,15 @@ rules
   [[ VarDecls(vds)  ^ (s) ]] := Map[[ vds ^ (s) ]].
   [[ VarDecl(xs, t) ^ (s) ]] := [[ t ^ (s) : ty]], MapT[[ xs ^ (s) : ty ]].
   [[ VarId(x) ^ (s) : ty ]] := Var{x} <- s, Var{x} : ty.
- 
+  // todo: add check for shadowing
  
   [[ FuncDecl(ph, b) ^ (s) ]] := 
      new s', s' -P-> s, 
      [[ ph ^ (s, s') ]], [[ b ^ (s') ]].
   
-  [[ FuncDirective(_, _) ^ (s) ]] := false | error "FuncDirectivenot implemented".
-  [[ FuncId(_, _) ^ (s) ]] := false | error "FuncId not implemented". 
+  // [[ FuncDirective(_, _) ^ (s) ]] := false | error "FuncDirectivenot implemented".
+  // [[ FuncId(_, _) ^ (s) ]] := false | error "FuncId not implemented". 
   
-  // [[ Statements(stms) ^ (s) ]] := Map[[ stms ^ (s) ]].
   
 rules // procedure and function definitions
      
@@ -129,17 +134,19 @@ rules // procedure and function definitions
   //[[ NoParams() ^ (s) : TNil() ]] := true. 
   [[ Params(params) ^ (s) : tys ]] := MapTs[[ params ^ (s) : tys]].
   
-  [[ ValueParams([VarId(x)], t) ^ (s) : ty ]] := 
-     Var{x} <- s, Var{x} : ty, [[ t ^ (s) : ty ]].
-     // todo: generalize to list of variables 
+  [[ ValueParams(vars, t) ^ (s) : ty ]] := 
+  	 Map[[ vars ^ (s) : ty]],
+	 [[ t ^ (s) : ty ]].
      
-  [[ VarParams([VarId(x)], t) ^ (s) : ty ]] := 
-     Var{x} <- s, Var{x} : ty, [[ t ^ (s) : ty ]].
-     // todo: generalize to list of variables 
+  [[ VarParams(vars, t) ^ (s) : ty ]] := 
+  	 Map[[ vars ^ (s) : ty]],
+	 [[ t ^ (s) : ty ]].
      
+  // depricated?  
   [[ VarParams(xs, t) ^ (s) : tys ]] := 
      [[ t ^ (s) : ty ]], MapTs[[ xs ^ (ty, s) : tys ]].
      
+  // depricated?
   [[ VarId(x) ^ (ty, s) : [ty] ]] :=
      Var{x} <- s, Var{x} : ty, [[ t ^ (s) : ty ]].
           
@@ -310,6 +317,9 @@ rules // constants
      
   [[ Int(_)  ^ (s) : IntT()  ]] := true.
   [[ Real(_) ^ (s) : RealT() ]] := true.
+  
+  [[ Neg() ^ (s) : IntT() ]] := true.
+  [[ Pos() ^ (s) : IntT() ]] := true.
   
 
    

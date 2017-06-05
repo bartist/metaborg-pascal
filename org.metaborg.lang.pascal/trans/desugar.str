@@ -9,6 +9,9 @@ strategies
   
 rules
 
+  desugar: 
+  	Some(thing) -> thing
+
   desugar:
   	Label(stringnum) -> Label(intnum)
   	where <string-to-int> stringnum => intnum
@@ -41,7 +44,7 @@ rules
   	where <desugar-proc-heading> h => h'
 
   desugar-proc-heading :
-  	ProcHeading(name, params) -> FuncHeading(name, params, TypeId("void"))
+  	ProcHeading(name, params) -> FuncHeading(name, params, TypeId("_void"))
   
   // Remove quotationmarks from string
   
