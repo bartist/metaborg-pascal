@@ -51,6 +51,9 @@ rules
   desugar :
   	String(str) -> String(str')
   	where <string-tokenize(|['\''])> str => [str']
+  	
+  desugar : 
+  	TypeId("char") -> TypeId("string")
 
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)

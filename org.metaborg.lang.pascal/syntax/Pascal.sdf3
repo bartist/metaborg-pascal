@@ -382,7 +382,7 @@ context-free syntax // Low Level Definitions
   
   Constant.ConstId = Sign? Identifier 
   Constant         = Number
-  Constant         = String
+  Constant.String  = String
    
   Number.Int  = Integernumber 
   Number.Real = Realnumber
