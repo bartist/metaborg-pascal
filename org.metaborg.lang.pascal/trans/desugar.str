@@ -37,7 +37,7 @@ rules
   // Transform procedures to Void function calls
   
   desugar :
-  	ProcCall(fun, params) -> FunCall(fun, params)
+  	ProcCall(fun, params) -> Assign(NilE(), FunCall(fun, params))
   
   desugar :
   	ProcDecl(h,b) -> FuncDecl(h', b)

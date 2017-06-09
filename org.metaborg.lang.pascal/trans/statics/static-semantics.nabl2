@@ -16,7 +16,7 @@ imports
   
 signature
      name resolution
-         namespaces Var Lab LabRef Fun Type
+         namespaces Program Var Lab LabRef Func Type
 
 rules // run-time library (=> define separately?)
 
@@ -65,7 +65,9 @@ rules
   [[ Block(lds, cds, tds, vds, pfds, stms, _) ^ (s) ]] := 
   	 distinct D(s)/Lab | error $[Duplicate Label] @NAMES, // distinct labels
   	 distinct D(s)/LabRef | error $[Duplicate Label usage] @NAMES, // distinct labels
+  	 distinct D(s)/Type | error $[Duplicate type declaration] @NAMES,
   	 distinct D(s)/Var | error $[Dublicate variable/constant] @NAMES, //distinct variables
+  	 distinct D(s)/Func | error $[Duplicate Function/Procedure] @NAMES,
      [[ lds ^ (s) ]], // labels
      [[ cds ^ (s) ]], // constants
      [[ tds ^ (s) ]], // types
@@ -97,7 +99,7 @@ rules
 	Type{t} |-> d,
 	d : ty.
      
-  [[ TypeDefs(tds) ^ (s) ]] := [[ tds ^ (s) ]].
+  [[ TypeDefs(tds) ^ (s) ]] := [[ tds ^ (s, s) ]].
   [[ [TypeDef(x, t) | typedefs] ^ (s, s_outer) ]] := 
   	[[ t ^ (s_outer) : ty ]], 
   	new s',
@@ -106,26 +108,37 @@ rules
   	Type{x} : ty,
   	[[ typedefs ^ (s', s_outer) ]].
   
+  [[ ArrayType(range, at) ^ (s) : ty ]] := 
+  	[[ at ^ (s) : rty ]],
+  	MapT[[ range ^ (s) : srty ]],
+  	ty == ArrayT(srty, rty).
+  	
+  [[ SubrangeType(lower, upper) ^ (s) : ty ]] :=
+  	[[ lower ^ (s) : ty ]],
+  	[[ upper ^ (s) :ty ]].
 
   [[ VarDecls(vds)  ^ (s) ]] := Map[[ vds ^ (s) ]].
   [[ VarDecl(xs, t) ^ (s) ]] := [[ t ^ (s) : ty]], MapT[[ xs ^ (s) : ty ]].
   [[ VarId(x) ^ (s) : ty ]] := Var{x} <- s, Var{x} : ty.
   // todo: add check for shadowing
- 
-  [[ FuncDecl(ph, b) ^ (s) ]] := 
-     new s', s' -P-> s, 
-     [[ ph ^ (s, s') ]], [[ b ^ (s') ]].
   
   // [[ FuncDirective(_, _) ^ (s) ]] := false | error "FuncDirectivenot implemented".
   // [[ FuncId(_, _) ^ (s) ]] := false | error "FuncId not implemented". 
   
   
 rules // procedure and function definitions
+ 
+  [[ ProcDecl(_, _) ^ (s) ]] := true.
+  
+  [[ FuncDecl(ph, b) ^ (s) ]] := 
+     new s', s' -P-> s, 
+     [[ ph ^ (s, s') ]], [[ b ^ (s') ]].
      
   [[ FuncHeading(f, params, t) ^ (s_par, s) ]] := 
      [[ params ^ (s) : tys ]], 
+     [[ t ^ (s) : ty ]], 
      Func{f} <- s_par, Func{f} : FunT(tys, ty), 
-     [[ t ^ (s) : ty ]], Var{f} <- s, Var{f} : ty. // return variable and type
+     Var{f} <- s, Var{f} : ty. // return variable and type
      
   [[ FuncId(f) ^ (s_par, s) ]] :=
      Func{f} -> s_par, Func{f} |-> d, d : FunT(tys, ty).
@@ -135,11 +148,11 @@ rules // procedure and function definitions
   [[ Params(params) ^ (s) : tys ]] := MapTs[[ params ^ (s) : tys]].
   
   [[ ValueParams(vars, t) ^ (s) : ty ]] := 
-  	 Map[[ vars ^ (s) : ty]],
+  	 MapT[[ vars ^ (s) : ty]],
 	 [[ t ^ (s) : ty ]].
      
   [[ VarParams(vars, t) ^ (s) : ty ]] := 
-  	 Map[[ vars ^ (s) : ty]],
+  	 MapT[[ vars ^ (s) : ty]],
 	 [[ t ^ (s) : ty ]].
      
   // depricated?  
@@ -241,8 +254,7 @@ rules // expressions
 
   [[ String(_) ^ (s) : StringT() ]] := true.
   
-  [[ NilE() ^ (s) : NilT() ]] := 
-     false | error "what do do with nil?".
+  [[ NilE() ^ (s) : VoidT() ]] := true.
   
   [[ Not(e) ^ (s) : BoolT() ]] := 
      [[ e ^ (s) : BoolT() ]].
@@ -307,8 +319,10 @@ rules // variables
      MapT[[ es ^ (s) : ty ]].
      
   [[ FunCall(x, params) ^ (s) : ty ]] := 
-     Func{x} -> s, Func{x} : FunT(tys, ty),
-     [[ params ^ (s) : tys ]].
+     [[ params ^ (s) : tys ]],
+     Func{x} -> s, 
+	 Func{x} |-> d,
+	 d : FunT(tys, ty).
 
 rules // constants
 

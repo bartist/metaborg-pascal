@@ -17,8 +17,7 @@ signature
      SetT(type)
      RecordT(scope)
      SubrangeT(Constant, Constant)
-     EnumT(scope)         
-     NilT()
+     EnumT(scope)   
      
 //  subtypes
 //  

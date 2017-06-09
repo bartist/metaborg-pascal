@@ -233,7 +233,7 @@ test function resolve [[
   	f := 2
   end;
  begin
- 	x := [[f]]()
+ 	x := [[f]](1)
  end.
 ]] resolve #2 to #1
 
@@ -247,7 +247,7 @@ test function parameter resolve [[
  begin
  	x := f(2)
  end.
-]] resolve #2 to #1
+]] resolve #3 to #2
 
 test nested function parameter resolve [[
   var
@@ -284,11 +284,11 @@ test nested function parameter resolve 2 [[
 // Procedure
 
 test procedure resolve [[
-procedure[[f]](x : integer);
+procedure [[f]](x : integer);
   begin
   end;
  begin
- 	[[f]]()
+ 	[[f]](1)
  end.
 ]] resolve #2 to #1
 
@@ -395,18 +395,6 @@ test function duplication [[
 	  	f := x
 	  end;
   function f(s:integer): integer;
-	  begin
-	  	f := s
-	  end;
-  begin
-  end.
-]] >= 1 error
-
-test procedure duplication [[
-  procedure f(x:integer);
-	  begin
-	  end;
-  procedure f(s:integer);
 	  begin
 	  end;
   begin
