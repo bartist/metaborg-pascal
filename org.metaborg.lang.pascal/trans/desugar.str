@@ -49,11 +49,13 @@ rules
   // Remove quotationmarks from string
   
   desugar :
-  	String(str) -> String(str')
-  	where <string-tokenize(|['\''])> str => [str']
+  	String(str) -> String(str'')
+  	with
+  		 <un-single-quote> str => str';
+  		 <string-replace(|"''","'")> str' => str''
   	
-  desugar : 
-  	TypeId("char") -> TypeId("string")
+//  desugar : 
+//  	TypeId("char") -> TypeId("string")
 
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)
