@@ -24,6 +24,22 @@ rules
     Labeled(Label(stringnum), stmnt) -> Labeled(intnum, stmnt)	
   	where <string-to-int> stringnum => intnum
   
+  desugar:
+    ArrayType([range_outer | range_inner], type) -> ArrayType(range_outer, sub_type)
+    where
+    	<desugar>ArrayType(range_inner,type) => sub_type
+  
+  desugar:
+  	ArrayType([], type) -> type
+  	
+  desugar: 
+  	IndexVar(ref, [position | positions]) -> IndexVar(inner, position)
+  	where
+  		<desugar>IndexVar(ref, positions) => inner
+  		
+  desugar:
+  	IndexVar(ref, []) -> ref
+  
   desugar :
     Params(ps) -> Params(ps')
     where <mapconcat(try(desugar-param))> ps => ps'
@@ -53,6 +69,8 @@ rules
   	with
   		 <un-single-quote> str => str';
   		 <string-replace(|"''","'")> str' => str''
+  //		 <un-single-quote-chars> str' => char;
+  //		 <explode-string> char => char'
   	
 //  desugar : 
 //  	TypeId("char") -> TypeId("string")

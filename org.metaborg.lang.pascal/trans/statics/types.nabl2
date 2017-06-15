@@ -8,6 +8,7 @@ signature
      IntT() 
      BoolT()
      StringT()
+     ChartT()
      FunT(type, type) 
      ProcT(type)
      ArrayT(type)
@@ -54,14 +55,14 @@ rules // types
   [[ EnumType(xs) ^ (s) : EnumT(s') ]] := 
      new s', false | note "EnumType not implemented".
     
-  [[ SubrangeType(c1, c2) ^ (s) : SubrangeT(c1, c2) ]] :=
-     [[ c1 ^ (s) : IntT() ]], [[ c2 ^ (s) : IntT() ]].
+//  [[ SubrangeType(c1, c2) ^ (s) : SubrangeT(c1, c2) ]] :=
+//     [[ c1 ^ (s) : IntT() ]], [[ c2 ^ (s) : IntT() ]].
     
   [[ Packed(t) ^ (s) : ty ]] :=
      false | note "Packed type not implemented".    
     
-  [[ ArrayType(ts, t) ^ (s) : ArrayT(tys, ty) ]] :=
-     MapTs[[ ts ^ (s) : tys ]], [[ t ^ (s) : ty ]].
+//  [[ ArrayType(ts, t) ^ (s) : ArrayT(tys, ty) ]] :=
+//    MapTs[[ ts ^ (s) : tys ]], [[ t ^ (s) : ty ]].
 
   [[ SetType(t)     ^ (s) : SetT(ty)     ]] := [[ t ^ (s) : ty ]].    
   
