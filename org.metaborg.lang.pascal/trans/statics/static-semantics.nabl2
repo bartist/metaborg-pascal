@@ -27,14 +27,14 @@ rules // run-time library (=> define separately?)
     
     Type{"integer"} <- s, Type{"integer"} : IntT(),
     Type{"boolean"} <- s, Type{"boolean"} : BoolT(),
-    Type{"string"}  <- s, Type{"string"}  : StringT(),
+    Type{"string"}  <- s, Type{"string"}  : ArrayT(IntT(),CharT()),
     Type{"char"}    <- s, Type{"char"}    : CharT(),
-    ChartT() <! StringT(),
+    
     // _void is used instead of void, because void can be defined as type
     Type{"_void"} 	<- s, Type{"_void"}	  : VoidT(),
     
-    Fun{"writeln"} <- s, Fun{"writeln"} : FunT([StringT()], VoidT()),
-    Fun{"readln"}  <- s, Fun{"readln"}  : FunT([StringT()], VoidT()),
+    Fun{"writeln"} <- s, Fun{"writeln"} : FunT([ArrayT(IntT(),CharT())], VoidT()),
+    Fun{"readln"}  <- s, Fun{"readln"}  : FunT([ArrayT(IntT(),CharT())], VoidT()),
      
     Op{ADD()}  <- s, Op{ADD()}  : FunT([IntT(), IntT()], IntT()),    
     Op{MIN()}  <- s, Op{MIN()}  : FunT([IntT(), IntT()], IntT()),     
@@ -257,7 +257,7 @@ rules // expressions
   
   [[ False() ^ (s) : BoolT() ]] := true.
 
-  [[ String(_) ^ (s) : ty ]] := ty <? StringT().
+  [[ String(_) ^ (s) : ArrayT(IntT(),CharT()) ]] := true.
   
   [[ NilE() ^ (s) : VoidT() ]] := true.
   
