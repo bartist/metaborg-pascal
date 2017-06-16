@@ -215,6 +215,7 @@ context-free syntax // Expressions
   Expression        = Variable
   Expression        = Number
   Expression.String = String
+  Expression.Char   = Char
   Expression.True   = <true> {case-insensitive}
   Expression.False  = <false> {case-insensitive}
   Expression.NilE   = <nil> {case-insensitive}
@@ -383,6 +384,7 @@ context-free syntax // Low Level Definitions
   Constant.ConstId = Sign? Identifier 
   Constant         = Number
   Constant.String  = String
+  Constant.Char    = Char
    
   Number.Int  = Integernumber 
   Number.Real = Realnumber
@@ -407,9 +409,10 @@ lexical restrictions
   
 lexical syntax // Strings
 
-  String = "'" Stringcharacter+  "'"
-  Stringcharacter = ~[\'] 
-  Stringcharacter = "''"
+  String = "'" StringCharacter StringCharacter+  "'"
+  Char = "'" StringCharacter  "'"
+  StringCharacter = ~[\'] 
+  StringCharacter = "''"
 
 lexical syntax // layout
   

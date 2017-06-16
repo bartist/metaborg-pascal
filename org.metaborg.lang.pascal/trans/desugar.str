@@ -69,12 +69,12 @@ rules
   	with
   		 <un-single-quote> str => str';
   		 <string-replace(|"''","'")> str' => str''
-  //		 <un-single-quote-chars> str' => char;
-  //		 <explode-string> char => char'
-  	
-//  desugar : 
-//  	TypeId("char") -> TypeId("string")
 
+  desugar : 
+    Char(char) -> Char(char')
+    where
+    	<un-single-quote> char => char'
+  	
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)
 //  
