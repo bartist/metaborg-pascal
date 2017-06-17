@@ -15,7 +15,7 @@ procedure f(x : integer);
 	end;
 begin
   goto 1;
-  x := f(3);
+  x := g(3);
   { Write 'Hello World' }
   1: writeln('Hello World')
 end.

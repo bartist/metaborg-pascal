@@ -14,6 +14,7 @@ imports
   nabl-lib
   types
   
+  
 signature
      name resolution
          namespaces Program Var Lab LabRef Func Type
@@ -29,12 +30,10 @@ rules // run-time library (=> define separately?)
     Type{"boolean"} <- s, Type{"boolean"} : BoolT(),
     Type{"string"}  <- s, Type{"string"}  : ArrayT(IntT(),CharT()),
     Type{"char"}    <- s, Type{"char"}    : CharT(),
+    // Type{"char"} <! Type{"string"},
     
     // _void is used instead of void, because void can be defined as type
     Type{"_void"} 	<- s, Type{"_void"}	  : VoidT(),
-    
-    Fun{"writeln"} <- s, Fun{"writeln"} : FunT([ArrayT(IntT(),CharT())], VoidT()),
-    Fun{"readln"}  <- s, Fun{"readln"}  : FunT([ArrayT(IntT(),CharT())], VoidT()),
      
     Op{ADD()}  <- s, Op{ADD()}  : FunT([IntT(), IntT()], IntT()),    
     Op{MIN()}  <- s, Op{MIN()}  : FunT([IntT(), IntT()], IntT()),     
@@ -92,7 +91,9 @@ rules
   	[[ c ^ (s_outer) : ty ]], 
   	new s',
   	s ---> s',
-  	Var{x} <- s', 
+  	Const{x} <- s', 
+  	Const{x} : ty,
+  	Var{x} <- s_outer,
   	Var{x} : ty,
   	[[ constdefs ^ (s', s_outer) ]].
   	// todo: add immutible  
@@ -192,6 +193,7 @@ rules // statements
   [[ Assign(v, e) ^ (s) ]] := 
      [[ v ^ (s) : ty1 ]], [[ e ^ (s) : ty2 ]], ty1 == ty2 | error $[[ty1] expected] @ v.
      // todo: subtype check?
+
      
   [[ Goto(l) ^ (s) ]] := 
 	LabRef{l} -> s,
@@ -230,7 +232,8 @@ rules // statements
      [[ e ^ (s) : ty ]], MapT[[ cs ^ (s) : ty ]].
      
   [[ CaseLimb(cnsts, stm) ^ (s) : ty ]] :=
-     Map[[ cnsts ^ (s) : ty ]], [[ stm ^ (s) ]].
+     MapT[[ cnsts ^ (s) : ty ]],
+     [[ stm ^ (s) ]].
      
   [[ With(vs, stm) ^ (s) ]] := 
      [[ stm ^ (s) ]], 
@@ -258,6 +261,7 @@ rules // expressions
   [[ False() ^ (s) : BoolT() ]] := true.
 
   [[ String(_) ^ (s) : ArrayT(IntT(),CharT()) ]] := true.
+  [[ Char(_) ^ (s) : CharT() ]] := true.
   
   [[ NilE() ^ (s) : VoidT() ]] := true.
   
@@ -293,19 +297,9 @@ rules // variables
   [[ Ref(x) ^ (s) : ty ]] :=
      Var{x} -> s, Var{x} |-> d, d : ty.
      
-//  [[ Ref(x) ^ (s) : ty ]] :=
-//     Var{x} -> s, Var{x} |-> d, d : ty. 
-//
-//     
-//  [[ Ref(x) ^ (s) : ty ]] :=
-//     Var{x} -> s, Var{x} |-> d, d : ty;  
-//     Const{x} -> s, Const{x} |-> d, d : ty.   
-//
-//  [[ Ref(x) ^ (s) : ty ]] :=
-//     ns{x} -> s, ns{x} |-> d, d : ty, (ns == Const; ns == Var). 
-         
-     // todo: identifier can also be other things: function, procedure, ...
-     
+  [[ Ref(x) ^ (s) : ty ]] :=
+  	Func{x} -> s, Func{x} |-> d, d : FunT(input, ty).
+  	     
   [[ IndexVar(v, es) ^ (s) : ty ]] :=
      [[ v ^ (s) : ArrayT(index_ty, ty) ]], 
      [[ es ^ (s) : index_ty ]].
@@ -327,12 +321,17 @@ rules // variables
      [[ params ^ (s) : tys ]],
      Func{x} -> s, 
 	 Func{x} |-> d,
-	 d : FunT(tys, ty).
+	 d : FunT(ftys, ty).
 
-rules // constants
+  [[ FunCall("writeln", params) ^ (s) : VoidT() ]] :=
+	[[ params ^ (s) : tys ]].
 
+
+  [[ FunCall("readln", params) ^ (s) : VoidT() ]] :=
+	[[ params ^ (s) : tys ]].
+	
   [[ ConstId(_, x) ^ (s) : ty ]] := 
-     Var{x} -> s, Var{x} |-> d, d : ty.
+     Const{x} -> s, Const{x} |-> d, d : ty.
      
   [[ Int(_)  ^ (s) : IntT() ]] := true.
   [[ Real(_) ^ (s) : RealT() ]] := true.
