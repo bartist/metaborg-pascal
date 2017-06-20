@@ -32,6 +32,9 @@ rules // run-time library (=> define separately?)
     Type{"char"}    <- s, Type{"char"}    : CharT(),
     // Type{"char"} <! Type{"string"},
     
+    Fun{"writeln"} <- s, Fun{"writeln"} : FunT([ArrayT(IntT(),CharT())], VoidT()),
+    Fun{"readln"}  <- s, Fun{"readln"}  : FunT([ArrayT(IntT(),CharT())], VoidT()),
+    
     // _void is used instead of void, because void can be defined as type
     Type{"_void"} 	<- s, Type{"_void"}	  : VoidT(),
      
@@ -316,19 +319,21 @@ rules // variables
      
   [[ Set(es) ^ (s) : SetT(ty) ]] :=
      MapT[[ es ^ (s) : ty ]].
+
+  [[ FunCall("writeln", params) ^ (s) : ty ]] :=
+  	ty == VoidT(),
+	[[ params ^ (s) : tys ]].
+
+
+  [[ FunCall("readln", params) ^ (s) : ty ]] :=
+  	ty == VoidT(),
+	[[ params ^ (s) : tys ]].
      
   [[ FunCall(x, params) ^ (s) : ty ]] := 
      [[ params ^ (s) : tys ]],
      Func{x} -> s, 
 	 Func{x} |-> d,
 	 d : FunT(ftys, ty).
-
-  [[ FunCall("writeln", params) ^ (s) : VoidT() ]] :=
-	[[ params ^ (s) : tys ]].
-
-
-  [[ FunCall("readln", params) ^ (s) : VoidT() ]] :=
-	[[ params ^ (s) : tys ]].
 	
   [[ ConstId(_, x) ^ (s) : ty ]] := 
      Const{x} -> s, Const{x} |-> d, d : ty.

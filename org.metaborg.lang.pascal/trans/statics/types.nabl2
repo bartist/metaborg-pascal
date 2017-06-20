@@ -59,8 +59,8 @@ rules // types
 //  [[ SubrangeType(c1, c2) ^ (s) : SubrangeT(c1, c2) ]] :=
 //     [[ c1 ^ (s) : IntT() ]], [[ c2 ^ (s) : IntT() ]].
     
-  [[ Packed(t) ^ (s) : ty ]] :=
-     false | note "Packed type not implemented".    
+//  [[ Packed(t) ^ (s) : ty ]] :=
+//     false | note "Packed type not implemented".    
     
 //  [[ ArrayType(ts, t) ^ (s) : ArrayT(tys, ty) ]] :=
 //    MapTs[[ ts ^ (s) : tys ]], [[ t ^ (s) : ty ]].

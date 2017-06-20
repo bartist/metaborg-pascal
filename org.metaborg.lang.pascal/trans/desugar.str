@@ -3,6 +3,12 @@ module desugar
 imports
   signatures/-
 
+signature
+
+	constructors
+		RecordType: Identifier * FieldList -> UnpackedStructuredType
+	
+
 strategies
 
   desugar-all = topdown(try(desugar))
@@ -75,6 +81,17 @@ rules
     where
     	<un-single-quote> char => char'
   	
+  desugar : 
+  	With([], stm) -> stm
+  
+  desugar : 
+  	With([ rec | recs ], stm) -> With(rec, with)
+  	where
+  		<desugar>With(recs, stm) => with
+  	
+//  desugar : 
+//  	TypeDef(name, RecordType(fields)) -> TypeDef(name, RecordType(name, fields))	
+  
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)
 //  
