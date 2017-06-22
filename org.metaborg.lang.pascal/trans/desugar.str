@@ -6,8 +6,7 @@ imports
 signature
 
 	constructors
-		RecordType: Identifier * FieldList -> UnpackedStructuredType
-	
+		RecordDef  : Identifier * Type -> TypeDefinition
 
 strategies
 
@@ -89,9 +88,11 @@ rules
   	where
   		<desugar>With(recs, stm) => with
   	
-//  desugar : 
-//  	TypeDef(name, RecordType(fields)) -> TypeDef(name, RecordType(name, fields))	
+  desugar : 
+  	TypeDef(name, RecordType(fields)) -> RecordDef(name, RecordType(fields))	
   
+  desugar : 
+   If(e, stm) -> IfElse(e,stm, None())
 //  desugar : 
 //    TypeId(str) -> TypeId(<lower-case>str)
 //  

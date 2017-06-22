@@ -4,6 +4,7 @@ signature
 
   types
   
+  	 ProgramT()
      RealT() 
      IntT() 
      BoolT()
@@ -16,10 +17,9 @@ signature
      PointerT(type) 
      FileT(type)
      SetT(type)
-     RecordT(scope)
+     RecordT(type)
      SubrangeT(Constant, Constant)
      EnumT(scope)   
-     AnyT()
      
 //  subtypes
 //  
@@ -59,7 +59,8 @@ rules // types
 //  [[ SubrangeType(c1, c2) ^ (s) : SubrangeT(c1, c2) ]] :=
 //     [[ c1 ^ (s) : IntT() ]], [[ c2 ^ (s) : IntT() ]].
     
-//  [[ Packed(t) ^ (s) : ty ]] :=
+  [[ Packed(t) ^ (s) : ty ]] :=
+	 [[ t ^ (s) : ty ]].
 //     false | note "Packed type not implemented".    
     
 //  [[ ArrayType(ts, t) ^ (s) : ArrayT(tys, ty) ]] :=
@@ -73,9 +74,17 @@ rules // types
          
 rules // record types
 
-  [[ RecordType(fs) ^ (s) : RecordT(s') ]] :=
-     new s', s' -P-> s, [[ fs ^ (s') ]].
-     
+  [[ [ RecordDef(name, RecordType(fs)) | typedefs ] ^ (s, s_outer) ]] :=
+      new s',
+      s ---> s',
+      Type{name} <- s', 
+      Type{name} : RecordT(Type{name}),
+      new s_record,
+      s_record -P-> s_outer,
+      Type{name} ===> s_record,
+      [[ fs ^ (s_record) ]], 
+      [[ typedefs ^ (s', s_outer) ]].
+       
   [[ FieldList(rss) ^ (s) ]] :=
      Map[[ rss ^ (s) ]].
      

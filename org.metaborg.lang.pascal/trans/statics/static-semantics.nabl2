@@ -65,7 +65,8 @@ rules
     [[ h ^ (s) ]], [[ b ^ (s') ]].
     
   [[ ProgramHeading(name, _) ^ (s) ]] :=
-     Program{name} <- s.
+     Program{name} <- s,
+     Program{name} : ProgramT().
     
   [[ Block(lds, cds, tds, vds, pfds, stms, _) ^ (s) ]] := 
   	 distinct D(s)/Lab | error $[Duplicate Label] @NAMES, // distinct labels
@@ -297,8 +298,12 @@ rules // expressions
 
 rules // variables
 
+
   [[ Ref(x) ^ (s) : ty ]] :=
      Var{x} -> s, Var{x} |-> d, d : ty.
+     
+  [[ Ref(x) ^ (s) : ty ]] :=
+     Var{x} -> s, Var{x} |-> d, ty == RecordT(d).
      
   [[ Ref(x) ^ (s) : ty ]] :=
   	Func{x} -> s, Func{x} |-> d, d : FunT(input, ty).
@@ -308,8 +313,14 @@ rules // variables
      [[ es ^ (s) : index_ty ]].
      
   [[ FieldDes(v, x) ^ (s) : ty ]] :=
-     [[ v ^ (s) : RecordT(s') ]],
-     Field{x} -> s', Field{x} |-> d, d : ty.
+     new s',
+     [[ v ^ (s) : vty ]],
+     vty == RecordT(rec_d) | error $[This is not a record],
+     rec_d ?===> s_rec,
+     s' ---> s_rec,
+     Field{x} -> s', 
+     Field{x} |-> d, 
+     d : ty. 
      
   [[ FileVar(v) ^ (s) : ty ]] := 
      [[ v ^ (s) : FileT(ty) ]].
