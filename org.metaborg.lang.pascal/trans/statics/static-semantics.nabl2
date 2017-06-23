@@ -239,10 +239,14 @@ rules // statements
      MapT[[ cnsts ^ (s) : ty ]],
      [[ stm ^ (s) ]].
      
-  [[ With(vs, stm) ^ (s) ]] := 
-     [[ stm ^ (s) ]], 
-     false | error "analysis for With not implemented".
-     // todo: treat with variables
+  [[ With(v, stm) ^ (s) ]] := 
+     new s',
+     s' ---> s,
+     [[ v ^ (s) : vty ]],
+     vty == RecordT(rec_d) | error $[This is not a record],
+     rec_d ?===> s_rec,
+     s' ---> s_rec,
+     [[ stm ^ (s') ]].
   
   [[ Set(arr) ^ (s) : ty ]] :=
   	MapT[[ arr ^ (s) : inner_type ]],

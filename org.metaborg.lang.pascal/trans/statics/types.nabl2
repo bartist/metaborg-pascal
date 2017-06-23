@@ -80,24 +80,25 @@ rules // record types
       Type{name} <- s', 
       Type{name} : RecordT(Type{name}),
       new s_record,
-      s_record -P-> s_outer,
+//      s_record -P-> s_outer,
       Type{name} ===> s_record,
-      [[ fs ^ (s_record) ]], 
+      [[ fs ^ (s_record, s_outer) ]], 
       [[ typedefs ^ (s', s_outer) ]].
        
-  [[ FieldList(rss) ^ (s) ]] :=
-     Map[[ rss ^ (s) ]].
+  [[ FieldList(rss) ^ (s, s_outer) ]] :=
+     Map2[[ rss ^ (s, s_outer) ]].
      
-  [[ FieldList(rss, variant) ^ (s) ]] :=
-     Map[[ rss ^ (s) ]],
+  [[ FieldList(rss, variant) ^ (s, s_outer) ]] :=
+     Map2[[ rss ^ (s, s_outer) ]],
      false | note "record type with variant not implemented". 
      
-  [[ RecordSection(xs, t) ^ (s) ]] :=
-     [[ t ^ (s) : ty ]], 
+  [[ RecordSection(xs, t) ^ (s, s_outer) ]] :=
+     [[ t ^ (s_outer) : ty ]], 
      MapT[[ xs ^ (s) : ty ]].
      
   [[ FieldId(x) ^ (s) : ty ]] := 
-     Field{x} <- s, Field{x} : ty.
+     Field{x} <- s, Field{x} : ty,
+     Var{x} <-s, Var{x} : ty.
      
 rules  // todo: variants
   

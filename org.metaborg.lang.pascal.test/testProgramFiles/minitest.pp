@@ -31,15 +31,18 @@ program test ();
 	  	f := 'Test '' 123'
 	  end;
   begin
-{   with book1, page, me do
+   i := 4;
+   with book1, author, me do
    begin
-   	book_id := 1;
-   end; }
+   	book_id := i;
+   end; 
    
    arr := [1,2,3,4,5];
-   (*arr[2] := book1.book_id;*)
+   arr[2] := book1.book_id;
    intmat[4] := arr;
    i := arr[3];
    res := f('dinges');
+   if true then
+   	i := arr[4];   
    writeln(res)
   end.
