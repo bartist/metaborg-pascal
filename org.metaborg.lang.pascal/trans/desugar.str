@@ -7,6 +7,7 @@ signature
 
 	constructors
 		RecordDef  : Identifier * Type -> TypeDefinition
+		EnumDef  : Identifier * Type -> TypeDefinition
 
 strategies
 
@@ -90,6 +91,9 @@ rules
   	
   desugar : 
   	TypeDef(name, RecordType(fields)) -> RecordDef(name, RecordType(fields))	
+  
+  desugar : 
+    TypeDef(name, EnumType(values)) -> EnumDef(name, EnumType(values))
   
   desugar : 
    If(e, stm) -> IfElse(e,stm, None())

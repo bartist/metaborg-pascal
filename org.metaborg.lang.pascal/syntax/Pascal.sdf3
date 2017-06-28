@@ -281,7 +281,9 @@ context-free syntax // Types
   TypeIdentifier.TypeId = Identifier
   
   SimpleType.EnumType = 
-    <(<{Identifier ", "}+>)>
+    <(<{EnumValue ", "}+>)>
+  
+  EnumValue.EnumValue = <<Identifier>>
   
   SimpleType.SubrangeType =
     <<Constant> .. <Constant>>

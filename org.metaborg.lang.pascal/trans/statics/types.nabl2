@@ -19,7 +19,7 @@ signature
      SetT(type)
      RecordT(type)
      SubrangeT(Constant, Constant)
-     EnumT(scope)   
+     EnumT(type)   
      
 //  subtypes
 //  
@@ -52,9 +52,6 @@ rules // types
 
   [[ TypeId(x) ^ (s) : ty ]] := 
      Type{x} -> s, Type{x} |-> d, d : ty.
-  
-  [[ EnumType(xs) ^ (s) : EnumT(s') ]] := 
-     new s', false | note "EnumType not implemented".
     
 //  [[ SubrangeType(c1, c2) ^ (s) : SubrangeT(c1, c2) ]] :=
 //     [[ c1 ^ (s) : IntT() ]], [[ c2 ^ (s) : IntT() ]].
@@ -80,10 +77,26 @@ rules // record types
       Type{name} <- s', 
       Type{name} : RecordT(Type{name}),
       new s_record,
-//      s_record -P-> s_outer,
       Type{name} ===> s_record,
       [[ fs ^ (s_record, s_outer) ]], 
       [[ typedefs ^ (s', s_outer) ]].
+  
+    [[ [ EnumDef(name,values) | typedefs ] ^ (s, s_outer) ]] :=
+      new s',
+      s ---> s',
+      Type{name} <- s', 
+      Type{name} : EnumT(Type{name}),
+      new s_enum,
+      s' ---> s_enum,
+      [[ values ^ (s_enum, s_outer) : EnumT(Type{name})]], 
+      [[ typedefs ^ (s', s_outer) ]].
+      
+  [[ EnumType(xs) ^ (s, s_outer) : ty ]] := 
+  	 Map2T[[ xs ^ (s, s_outer) : ty ]].
+
+  [[ EnumValue(value) ^ (s, s_outer) : ty ]] :=
+  	 Var{value} <- s, Var{value} : ty,
+  	 Const{value} <- s, Const{value} : ty.
        
   [[ FieldList(rss) ^ (s, s_outer) ]] :=
      Map2[[ rss ^ (s, s_outer) ]].
