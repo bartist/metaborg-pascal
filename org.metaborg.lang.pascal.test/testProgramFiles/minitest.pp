@@ -2,17 +2,14 @@ program test ();
   type 
 	colors = (red, yellow, green, blue, tartan);
 	colorCode = array[red..tartan] of integer;
-	Date = record
-		day: integer;
-		month: integer;
-		year: integer;
-	end;
 	Person = record
 	   name: string;
 	   surname: string;
 	   age: integer;
-	   birthdate : Date;
 	   eyes: colors;
+	   case stuff : boolean of
+	   	true : (ja : string);
+	   	false : (nee : string)
 	end;
   var
     me: Person;
@@ -21,11 +18,11 @@ program test ();
   begin
 	c := red;
 	cc[c] := 23;
-	with me, birthdate do
+	me.stuff := false;
+	with me do
 	begin
 		eyes := green;
-		day := 16;
-		month := 5;
-		year := 1993;
+		stuff := true;
+		ja := 'test';
 	end;
   end.

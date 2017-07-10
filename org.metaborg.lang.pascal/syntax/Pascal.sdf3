@@ -214,10 +214,10 @@ context-free syntax // Expressions
   Expression        = <(<Expression>)> {bracket}  
   Expression        = Variable
   Expression        = Number
+  Expression		= Boolean
   Expression.String = String
   Expression.Char   = Char
-  Expression.True   = <true> {case-insensitive}
-  Expression.False  = <false> {case-insensitive}
+  Expression		= Boolean
   Expression.NilE   = <nil> {case-insensitive}
   Expression.Not    = <not <Expression>> {case-insensitive}
   Expression.Set    = <[<{Expression ","}*>]>
@@ -315,26 +315,39 @@ context-free syntax // Record Fields
   > {case-insensitive}
   
   FieldList.FieldList = <
-    <{RecordSection "\n"}*> 
-    <Variants>
+    <{RecordSection ";"}*> 
+    <FieldListOptional?>
   >
   
-  FieldList.FieldList = 
-    <<{RecordSection "\n"}*>>
+  FieldList.FieldList= OptionalVariants
+  
+  FieldListOptional.Optional = <
+  	;
+  	<OptionalVariants?>
+  >
+  
+  OptionalVariants.Variants = <
+  	<{Variants ";"}+>
+  	<Term?>
+  >
+  
+  
 
   RecordSection.RecordSection =
-    <<{FieldIdentifier ", "}+> : <Type>;>
+    <<{FieldIdentifier ", "}+> : <Type>>
 
   FieldIdentifier.FieldId = Identifier
   
   Variants.Variant = <
-    case <Tagfield?> <TypeIdentifier> of 
-      <{Variant ";\n"}+>;
+    case <VariantSelector> of 
+      <{Variant ";\n"}+>
   > {case-insensitive}
 
-  Tagfield.Tag = <<Identifier> :>
+  VariantSelector.Selector = <<Tagfield?> <TypeIdentifier>>
+  
+  Tagfield.FieldId = <<Identifier> :>
 
-  Variant.Variant = 
+  Variant.VariantCase = 
     <<{Constant ", "}+> : (<FieldList>)>
 
 context-free syntax // Input/Output
@@ -350,11 +363,11 @@ context-free syntax // Input/Output
 
 lexical syntax // Variable and Identifier Categories
 
-  Identifier = [a-zA-Z][a-zA-Z0-9\_]*
+  Identifier = [a-zA-Z][a-zA-Z0-9]*
   
 lexical restrictions
 
-  Identifier -/- [a-zA-Z0-9\_]
+  Identifier -/- [a-zA-Z0-9]
 
 context-free syntax
 
@@ -387,6 +400,10 @@ context-free syntax // Low Level Definitions
   Constant         = Number
   Constant.String  = String
   Constant.Char    = Char
+  Constant		   = Boolean
+  
+  Boolean.True = <true> {case-insensitive}
+  Boolean.False = <false> {case-insensitive}
    
   Number.Int  = Integernumber 
   Number.Real = Realnumber
@@ -399,7 +416,7 @@ lexical syntax // Numbers
   Integernumber = Digitsequence
   Realnumber    = Digitsequence "." Digitsequence? Scalefactor?
   Realnumber    = Digitsequence Scalefactor
-  Scalefactor   = [Ee] [\+\-]? Digitsequence
+  Scalefactor   = [E] [\+\-]? Digitsequence
 
   Unsigneddigitsequence = [0-9]+
   Digitsequence = [\+\-]? Unsigneddigitsequence

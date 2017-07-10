@@ -78,6 +78,7 @@ rules // record types
       Type{name} : RecordT(Type{name}),
       new s_record,
       Type{name} ===> s_record,
+      distinct D(s_record)/Field | error $[Duplicate fields] @NAMES, 
       [[ fs ^ (s_record, s_outer) ]], 
       [[ typedefs ^ (s', s_outer) ]].
   
@@ -97,13 +98,10 @@ rules // record types
   [[ EnumValue(value) ^ (s, s_outer) : ty ]] :=
   	 Var{value} <- s, Var{value} : ty,
   	 Const{value} <- s, Const{value} : ty.
-       
-  [[ FieldList(rss) ^ (s, s_outer) ]] :=
-     Map2[[ rss ^ (s, s_outer) ]].
      
-  [[ FieldList(rss, variant) ^ (s, s_outer) ]] :=
+  [[ FieldList(rss, variants, _) ^ (s, s_outer) ]] :=
      Map2[[ rss ^ (s, s_outer) ]],
-     false | note "record type with variant not implemented". 
+     Map2[[ variants ^ (s, s_outer) ]].
      
   [[ RecordSection(xs, t) ^ (s, s_outer) ]] :=
      [[ t ^ (s_outer) : ty ]], 
@@ -113,5 +111,17 @@ rules // record types
      Field{x} <- s, Field{x} : ty,
      Var{x} <-s, Var{x} : ty.
      
-rules  // todo: variants
+rules  
+
+  [[ Variant(sel, cases) ^ (s, s_outer) ]] := // todo: cases should be unique
+  	[[ sel ^ (s, s_outer) : ty ]],
+  	Map2T[[ cases ^ (s, s_outer) : ty ]].
+  	
+  [[ Selector(tag, tyid) ^ (s, s_outer) : ty ]] :=
+  	[[ tyid ^ (s_outer) : ty]],
+  	[[ tag ^ (s) : ty]].
+  	
+  [[ VariantCase(values, fields) ^ (s, s_outer) : ty ]] :=
+  	MapT[[ values ^ (s) : ty ]],
+  	[[ fields ^ (s, s_outer) ]].
   

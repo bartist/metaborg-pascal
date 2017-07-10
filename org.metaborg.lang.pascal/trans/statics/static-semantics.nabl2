@@ -32,9 +32,6 @@ rules // run-time library (=> define separately?)
     Type{"char"}    <- s, Type{"char"}    : CharT(),
     // Type{"char"} <! Type{"string"},
     
-    Fun{"writeln"} <- s, Fun{"writeln"} : FunT([ArrayT(IntT(),CharT())], VoidT()),
-    Fun{"readln"}  <- s, Fun{"readln"}  : FunT([ArrayT(IntT(),CharT())], VoidT()),
-    
     // _void is used instead of void, because void can be defined as type
     Type{"_void"} 	<- s, Type{"_void"}	  : VoidT(),
      
@@ -72,7 +69,7 @@ rules
   	 distinct D(s)/Lab | error $[Duplicate Label] @NAMES, // distinct labels
   	 distinct D(s)/LabRef | error $[Duplicate Label usage] @NAMES, // distinct labels
   	 distinct D(s)/Type | error $[Duplicate type declaration] @NAMES,
-  	 distinct D(s)/Var | error $[Dublicate variable/constant] @NAMES, //distinct variables
+  	 distinct D(s)/Var | error $[Duplicate variable/constant] @NAMES, //distinct variables
   	 distinct D(s)/Func | error $[Duplicate Function/Procedure] @NAMES,
      [[ lds ^ (s) ]], // labels
      [[ cds ^ (s) ]], // constants
