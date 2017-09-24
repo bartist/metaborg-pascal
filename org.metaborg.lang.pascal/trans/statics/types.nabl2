@@ -44,25 +44,13 @@ rules // subtype relation
 
 rules // types
 
-  // type equality: nominal or structural?
-  
-  // [[ IntType()  ^ (s) : IntT()  ]] := true.
-  
-  // [[ BoolType() ^ (s) : BoolT() ]] := true.
-
   [[ TypeId(x) ^ (s) : ty ]] := 
      Type{x} -> s, Type{x} |-> d, d : ty.
     
-//  [[ SubrangeType(c1, c2) ^ (s) : SubrangeT(c1, c2) ]] :=
-//     [[ c1 ^ (s) : IntT() ]], [[ c2 ^ (s) : IntT() ]].
-    
   [[ Packed(t) ^ (s) : ty ]] :=
-	 [[ t ^ (s) : ty ]].
-//     false | note "Packed type not implemented".    
-    
-//  [[ ArrayType(ts, t) ^ (s) : ArrayT(tys, ty) ]] :=
-//    MapTs[[ ts ^ (s) : tys ]], [[ t ^ (s) : ty ]].
-
+	 [[ t ^ (s) : ty ]],
+	 false |  note $[Packed not supported].
+	 
   [[ SetType(t)     ^ (s) : SetT(ty)     ]] := [[ t ^ (s) : ty ]].    
   
   [[ FileType(t)    ^ (s) : FileT(ty)    ]] := [[ t ^ (s) : ty ]].   

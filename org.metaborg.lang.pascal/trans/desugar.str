@@ -60,7 +60,7 @@ rules
   // Transform procedures to Void function calls
   
   desugar :
-  	ProcCall(fun, params) -> Assign(NilE(), FunCall(fun, params))
+  	ProcCall(fun, params) -> FunCall(fun, params)
   
   desugar :
   	ProcDecl(h,b) -> FuncDecl(h', b)
@@ -78,9 +78,10 @@ rules
   		 <string-replace(|"''","'")> str' => str''
 
   desugar : 
-    Char(char) -> Char(char')
-    where
-    	<un-single-quote> char => char'
+    Char(char) -> Char(char'')
+    with
+    	<un-single-quote> char => char';
+  		 <string-replace(|"''","'")> char' => char''
   	
   desugar : 
   	With([], stm) -> stm
@@ -105,7 +106,10 @@ rules
   	FieldList(records, None()) -> FieldList(records, [], None())
   	
   desugar :
-  	FieldList(Variants(variants,term)) -> FieldList([], variants, term)
+  	FieldList(Some(Variants(variants,term))) -> FieldList([], variants, term)
+  
+  desugar :
+  	FieldList(None()) -> FieldList([], [], None())
   
   desugar : 
     TypeDef(name, EnumType(values)) -> EnumDef(name, EnumType(values))

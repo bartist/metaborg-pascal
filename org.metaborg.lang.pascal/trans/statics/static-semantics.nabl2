@@ -25,15 +25,20 @@ rules // run-time library (=> define separately?)
     new s,
     
     Var{"eof"} <- s, Var{"eof"} : BoolT(),
+    Var{"nil"} <- s, Var{"nil"} : PointerT(ty),
     
     Type{"integer"} <- s, Type{"integer"} : IntT(),
     Type{"boolean"} <- s, Type{"boolean"} : BoolT(),
     Type{"string"}  <- s, Type{"string"}  : ArrayT(IntT(),CharT()),
     Type{"char"}    <- s, Type{"char"}    : CharT(),
+    Type{"text"}	<- s, Type{"file"}	  : FileT(CharT()), // section 6.4.3.5, last note
     // Type{"char"} <! Type{"string"},
     
     // _void is used instead of void, because void can be defined as type
-    Type{"_void"} 	<- s, Type{"_void"}	  : VoidT(),
+    Type{"_void"} 	<- s, Type{"_void"}	  : VoidT(),    
+    
+    Func{"writeln"} <- s, Func{"writeln"} : FunT([ArrayT(IntT(),CharT())],VoidT()),
+    Func{"readln"}  <- s, Funcc{"readln"}  : FunT([ArrayT(IntT(),CharT())],VoidT()),
      
     Op{ADD()}  <- s, Op{ADD()}  : FunT([IntT(), IntT()], IntT()),    
     Op{MIN()}  <- s, Op{MIN()}  : FunT([IntT(), IntT()], IntT()),     
@@ -50,7 +55,6 @@ rules // run-time library (=> define separately?)
     Op{GEQ()}  <- s, Op{GEQ()}  : FunT([IntT(), IntT()], BoolT()), 
     
     Op{IN()}   <- s, Op{IN()}   : FunT([ty, SetT(ty)], BoolT()), 
-                                  // correct?
                                     
     Op{OR()}   <- s, Op{OR()}   : FunT([BoolT(), BoolT()], BoolT()), 
     Op{AND()}  <- s, Op{AND()}  : FunT([BoolT(), BoolT()], BoolT()).
@@ -146,7 +150,6 @@ rules // procedure and function definitions
      Func{f} -> s_par, Func{f} |-> d, d : FunT(tys, ty).
      // reference to previous declaration?
   
-  //[[ NoParams() ^ (s) : TNil() ]] := true. 
   [[ Params(params) ^ (s) : tys ]] := MapTs[[ params ^ (s) : tys]].
   
   [[ ValueParams(vars, t) ^ (s) : ty ]] := 
@@ -156,34 +159,20 @@ rules // procedure and function definitions
   [[ VarParams(vars, t) ^ (s) : ty ]] := 
   	 MapT[[ vars ^ (s) : ty]],
 	 [[ t ^ (s) : ty ]].
-     
-  // depricated?  
-  [[ VarParams(xs, t) ^ (s) : tys ]] := 
-     [[ t ^ (s) : ty ]], MapTs[[ xs ^ (ty, s) : tys ]].
-     
-  // depricated?
-  [[ VarId(x) ^ (ty, s) : [ty] ]] :=
-     Var{x} <- s, Var{x} : ty, [[ t ^ (s) : ty ]].
-          
+               
   [[ PackedArraySchema(bss, t) ^ (s) : ArrayT(tys, ty) ]] := 
      MapTs[[ bss ^ (s) : tys ]], [[ t ^ (s) : ty ]].
      
   [[ UnpackedArraySchema(bss, t) ^ (s) : ArrayT(tys, ty) ]] := 
      MapTs[[ bss ^ (s) : tys ]], [[ t ^ (s) : ty ]].
      // todo: what to do with bounds
-     
-  // [[ SubrangeType(c1, c2) ^ (s) : IntT() ]] :=
-  //   [[ c1 ^ (s) : IntT() ]], [[ c2 ^ (s) : IntT() ]].
-     
+          
   [[ BoundSpec(lo, hi, t) ^ (s) ]] := 
      [[ t ^ (s) : ty ]]. 
      // todo: what are identifiers in bound specification?
      // t should be an ordinal type identifier, which means?
 
 rules // statements
-
-  //[[ Term(stm) ^ (s) ]] := 
-  //   [[ stm ^ (s) ]].
 
   [[ Labeled(l, stm) ^ (s) ]] := 
   	 Lab{l} -> s,
@@ -238,28 +227,23 @@ rules // statements
      
   [[ With(v, stm) ^ (s) ]] := 
      new s',
-     s' ---> s,
+     s' -P-> s,
      [[ v ^ (s) : vty ]],
      vty == RecordT(rec_d) | error $[This is not a record],
      rec_d ?===> s_rec,
-     s' ---> s_rec,
+     s' -I-> s_rec,
      [[ stm ^ (s') ]].
   
   [[ Set(arr) ^ (s) : ty ]] :=
   	MapT[[ arr ^ (s) : inner_type ]],
-  	ty == ArrayT(callType, inner_type).
+  	ty == SetT(inner_type).
   	// todo: Add range test
 
 rules // parameters
 
-  //[[ NoParams() ^ (s) : TNil()  ]] := true. 
   [[ Params(es) ^ (s) : tys ]] := MapTs[[ es ^ (s) : tys ]].
   
 rules // expressions
-
-  //[[ e1 @ Amb([e2 | _ ]) ^ (s) : ty ]] :=
-  //   [[ e2 ^ (s) : ty ]],
-  //   false | warning "ambiguous term" @e1.
 
   [[ True() ^ (s) : BoolT() ]] := true.
   
@@ -274,7 +258,7 @@ rules // expressions
      [[ e ^ (s) : BoolT() ]].
   
   [[ Sign(_, e) ^ (s) : IntT() ]] := 
-     [[ e ^ (s) : IntT() ]]. // todo: ? 
+     [[ e ^ (s) : IntT() ]].
   
   [[ RelOp(e1, op, e2) ^ (s) : ty ]] :=
      Op[[ op ^ (s) : FunT([ty1, ty2], ty) ]],
@@ -305,10 +289,7 @@ rules // variables
      
   [[ Ref(x) ^ (s) : ty ]] :=
      Var{x} -> s, Var{x} |-> d, ty == RecordT(d).
-     
-  [[ Ref(x) ^ (s) : ty ]] :=
-  	Func{x} -> s, Func{x} |-> d, d : FunT(input, ty).
-  	     
+    	     
   [[ IndexVar(v, es) ^ (s) : ty ]] :=
      [[ v ^ (s) : ArrayT(index_ty, ty) ]], 
      [[ es ^ (s) : index_ty ]].
@@ -331,21 +312,12 @@ rules // variables
      
   [[ Set(es) ^ (s) : SetT(ty) ]] :=
      MapT[[ es ^ (s) : ty ]].
-
-  [[ FunCall("writeln", params) ^ (s) : ty ]] :=
-  	ty == VoidT(),
-	[[ params ^ (s) : tys ]].
-
-
-  [[ FunCall("readln", params) ^ (s) : ty ]] :=
-  	ty == VoidT(),
-	[[ params ^ (s) : tys ]].
      
   [[ FunCall(x, params) ^ (s) : ty ]] := 
      [[ params ^ (s) : tys ]],
      Func{x} -> s, 
 	 Func{x} |-> d,
-	 d : FunT(ftys, ty).
+	 d : FunT(tys, ty).
 	
   [[ ConstId(_, x) ^ (s) : ty ]] := 
      Const{x} -> s, Const{x} |-> d, d : ty.

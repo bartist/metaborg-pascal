@@ -315,11 +315,11 @@ context-free syntax // Record Fields
   > {case-insensitive}
   
   FieldList.FieldList = <
-    <{RecordSection ";"}*> 
+    <{RecordSection ";"}+> 
     <FieldListOptional?>
   >
   
-  FieldList.FieldList= OptionalVariants
+  FieldList.FieldList= <<OptionalVariants?>>
   
   FieldListOptional.Optional = <
   	;
@@ -330,8 +330,7 @@ context-free syntax // Record Fields
   	<{Variants ";"}+>
   	<Term?>
   >
-  
-  
+   
 
   RecordSection.RecordSection =
     <<{FieldIdentifier ", "}+> : <Type>>
@@ -387,6 +386,7 @@ context-free syntax
   Identifier = <true>      {reject,case-insensitive}
   Identifier = <false>     {reject,case-insensitive}
   Identifier = <not>       {reject,case-insensitive}
+  Identifier = <with>      {reject,case-insensitive}
   
 context-free syntax
   
@@ -416,7 +416,7 @@ lexical syntax // Numbers
   Integernumber = Digitsequence
   Realnumber    = Digitsequence "." Digitsequence? Scalefactor?
   Realnumber    = Digitsequence Scalefactor
-  Scalefactor   = [E] [\+\-]? Digitsequence
+  Scalefactor   = [e] [\+\-]? Digitsequence
 
   Unsigneddigitsequence = [0-9]+
   Digitsequence = [\+\-]? Unsigneddigitsequence
